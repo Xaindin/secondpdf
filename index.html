@@ -2,522 +2,545 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Alpha — Line 1 & Line 2</title>
+
+<!-- ============  STYLE (dark neon) ============ -->
 <style>
   :root{
-    --card:rgba(15,15,25,.78);
-    --border:rgba(255,255,255,.12);
-    --text:#e8f0ff;
-    --muted:#a5b4fc;
-    --accent1:#7c3aed; /* purple */
-    --accent2:#06b6d4; /* cyan */
+    --bg:#0b0f1a; --card:#1f2433; --muted:#8ea0b8; --text:#e8eefc;
+    --accent1:#6ee7ff; --accent2:#a78bfa; --accent3:#22d3ee; --ok:#10b981; --err:#ef4444;
+    --ring: 0 0 0 2px rgba(102,126,234,.25), 0 0 25px rgba(99,102,241,.25);
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-    background:#0a0a12;color:var(--text);overflow-x:hidden
-  }
-  .bg{position:fixed;inset:0;z-index:-3;background:
-    radial-gradient(1200px 700px at 20% -10%, #0ea5e9 0%, transparent 60%),
-    radial-gradient(1000px 600px at 80% 110%, #a78bfa 0%, transparent 60%),
-    linear-gradient(135deg,#0b1220,#0a0a12 40%,#0b1326);
-    animation:shift 18s ease-in-out infinite alternate}
-  @keyframes shift{to{background-position:50px -40px,-60px 30px,0 0}}
-  canvas#glitter{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.45}
-
-  .container{max-width:1100px;margin:24px auto;padding:16px}
-  .brand{display:flex;align-items:center;gap:14px;margin-bottom:10px}
-  .alpha-logo{height:72px;width:72px;object-fit:contain}
-  h1{margin:0;text-shadow:0 0 10px rgba(124,58,237,.35);font-size:24px}
-
-  .tabs{display:flex;gap:10px;margin:14px 0 20px;flex-wrap:wrap}
-  .tab-btn{
-    border:1px solid var(--border);background:rgba(255,255,255,.04);color:#c7d2fe;
-    border-radius:999px;padding:10px 14px;font-weight:700;cursor:pointer
-  }
-  .tab-btn.active{background:linear-gradient(135deg,var(--accent1),var(--accent2));color:#fff;border-color:transparent;box-shadow:0 0 20px rgba(124,58,237,.35)}
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin:8px 0 14px}
-  .btn{border:1px solid rgba(255,255,255,.18);background:linear-gradient(135deg,var(--accent1),var(--accent2));color:#fff;border-radius:999px;padding:10px 14px;font-weight:700;cursor:pointer}
-  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
-  .note{font-size:12px;color:#c7d2fe}
-
-  .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:16px;backdrop-filter:blur(12px);margin-bottom:16px}
+  body{margin:0;background:radial-gradient(1200px 800px at 10% -10%, #111831 0%, #0b0f1a 50%), #0b0f1a;color:var(--text);font:15px/1.5 system-ui,Segoe UI,Roboto,Arial}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg, rgba(11,15,26,.95), rgba(11,15,26,.75));backdrop-filter:blur(8px);border-bottom:1px solid #1a2233}
+  .wrap{max-width:1100px;margin:0 auto;padding:14px 16px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .grow{flex:1}
+  .logo{width:46px;height:46px;border-radius:999px;object-fit:cover;box-shadow:0 0 0 2px #111,0 0 30px rgba(255,255,255,.06)}
+  h1{margin:0;font-size:20px;letter-spacing:.3px}
+  .tabs{display:flex;gap:8px}
+  .tabbtn{border:1px solid #2a3247;background:#151a27;color:var(--text);padding:8px 14px;border-radius:12px;cursor:pointer;font-weight:600}
+  .tabbtn.active{background:linear-gradient(135deg,#312e81,#1e3a8a);border-color:transparent;box-shadow:var(--ring)}
+  .pill{font-size:12px;color:var(--muted)}
+  .btn{border:1px solid #2a3247;background:#151a27;color:var(--text);padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:700}
+  .btn.primary{background:linear-gradient(135deg,#4338ca,#2563eb);border-color:transparent}
+  .btn.ok{background:linear-gradient(135deg,#059669,#10b981)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .card{background:linear-gradient(180deg,#1f2433,#1a2030);border:1px solid #2a3247;border-radius:16px;padding:16px;margin:16px 0;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+  .card h2{margin:0 0 12px;font-size:18px}
+  label{display:block;color:#aab7d4;font-size:12px;margin:6px 0 4px}
+  input,select,textarea{width:100%;background:#111727;border:1px solid #2a3247;color:var(--text);border-radius:12px;padding:10px 12px}
+  input:focus,select:focus,textarea:focus{outline:none;box-shadow:var(--ring);border-color:#5960ff}
   .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
   .col-2{grid-column:span 2}.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-  label{display:block;font-size:12px;color:var(--muted);margin:6px 0 4px}
-  input,select,textarea{
-    width:100%;border:1px solid var(--border);border-radius:12px;padding:10px 12px;font-size:14px;
-    background:#0f1322;color:var(--text);outline:none
-  }
-  select, option{background:#0b0f1a;color:#e8f0ff}
-  textarea{min-height:90px;resize:vertical}
-  .table{width:100%;border-collapse:collapse}
-  .table th,.table td{border:1px solid var(--border);padding:8px;font-size:13px}
-  .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border:1px dashed var(--border);border-radius:999px;font-size:12px}
-  .hidden{display:none}
+  table{width:100%;border-collapse:collapse}
+  th,td{border:1px solid #2a3247;padding:8px;font-size:13px}
+  th{background:#151a27}
+  .status{margin-top:8px;font-size:13px}
+  .ok{color:var(--ok)} .err{color:var(--err)} .muted{color:var(--muted)}
+  footer{color:#7d8ca8;text-align:center;margin:28px 0}
+  .hide{display:none}
 </style>
 </head>
+
 <body>
-<div class="bg"></div><canvas id="glitter"></canvas>
-
-<div class="container">
-  <div class="brand">
-    <!-- Replace src with your real logo file OR base64; for now it's a placeholder circle -->
-    <img class="alpha-logo" src="data:image/svg+xml;utf8,
-      <svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'>
-        <defs><radialGradient id='g' cx='50%' cy='50%'><stop offset='0%' stop-color='%23a78bfa'/><stop offset='100%' stop-color='%2306b6d4'/></radialGradient></defs>
-        <circle cx='48' cy='48' r='40' fill='url(%23g)'/></svg>" alt="Alpha"/>
-    <h1>Alpha — Client Forms</h1>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="line1">Line 1 (Google Sheet)</button>
-    <button class="tab-btn" data-tab="line2">Line 2 (PDF Only)</button>
-  </div>
-
-  <!-- ===================== LINE 1 (Sheets) ===================== -->
-  <section id="line1" class="tab-panel">
-    <div class="toolbar">
-      <button class="btn ghost" id="l1-saveDraft">Save Draft</button>
-      <button class="btn ghost" id="l1-loadDraft">Load Draft</button>
-      <span class="note">Saves locally on this device</span>
+<header>
+  <div class="wrap row" style="justify-content:space-between">
+    <div class="row">
+      <!-- Embedded Alpha logo -->
+      <img class="logo" alt="Alpha" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAYAAABW1J8fAAAACXBIWXMAAAsSAAALEgHS3X78AAABrElEQVR4nO3QsQ2DQBQF0WmQHkC0O0mM1kGmQqAqQyYF8FB1Hj3nQ7kq8m2Yz3B9DqIu0fASwAAAAAAAAAAlHqN4W6k9g0v8R2rJq7z9c9vJc2x7b+6F2m4bX2m9E1Y0r7C3CqWg9L3Qz9l7Y4l2Q0h9sVV9aW0mL3c0yX+4z2g2g9N9r2vM8l7k0zC1nJw2b9f8m8Yz9i2wq2f4e9Qe5p5Y6mG2b8a4bqf0J9kCj3m0m9x7oQk9o7k9r8l9c3l0v9f3AAAAAAAAAAAAAODyB6n9B0+N7e0l2c0q8d0fG1i8H6p5m8k9b7b8f+q7G7lG5P7e3m7b8b6o7u8c6I3i8d6m5c4m4p6W5EUj3i2m8C8U8bWAAAAAHg1RZ0AAAB4o0m9AAAAeLQxAAAAeJ4xAAAAeH4xAAAAeK4xAAAAG7yUAwAAAAAAAABg1y0v7S8HqQAAAABJRU5ErkJggg=="/>
+      <h1>Alpha — Player & Client Forms</h1>
+      <span class="pill">A01–A20 • clean PDF for Line 2</span>
     </div>
+    <div class="tabs">
+      <button class="tabbtn active" id="tab-l1">Line 1</button>
+      <button class="tabbtn" id="tab-l2">Line 2</button>
+      <button class="btn ok" id="l2-downloadPdf">Download PDF</button>
+    </div>
+  </div>
+</header>
 
+<main class="wrap">
+  <!-- ============ LINE 1 (sheet submit) ============ -->
+  <section id="pane-l1" class="card">
+    <h2>Line 1 — Player Intake</h2>
     <form id="line1Form">
-      <div class="card">
-        <h3 style="margin:4px 0 12px 0">Line 1 — Player Details</h3>
-        <div class="grid">
-          <div class="col-3">
-            <label>Player ID (A01–A20) *</label>
-            <select name="playerId" id="l1-playerId" required>
-              <option value="">Select</option>
-            </select>
-          </div>
-          <div class="col-6"><label>Player Name *</label><input name="playerName" required/></div>
-          <div class="col-3"><label>Language</label>
-            <select name="language"><option value="">Select</option><option>Hindi</option><option>English</option><option>Telugu</option><option>Gujarati</option><option>Other</option></select>
-          </div>
-
-          <div class="col-6"><label>Customer Name</label><input name="customerName"/></div>
-          <div class="col-3"><label>Phone Number</label><input name="phone" inputmode="numeric"/></div>
-          <div class="col-3"><label>Gender</label>
-            <select name="gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select>
-          </div>
-
-          <div class="col-4"><label>Age</label><input type="number" min="0" name="age"/></div>
-          <div class="col-4"><label>Location</label><input name="location"/></div>
-          <div class="col-4"><label>Profession</label>
-            <select name="profession">
-              <option value="">Select</option>
-              <option>Daily Labor</option>
-              <option>Security Guard</option>
-              <option>Driver</option>
-              <option>Shopkeeper</option>
-              <option>Delivery Partner</option>
-              <option>Electrician</option>
-              <option>Plumber</option>
-              <option>Mechanic</option>
-              <option>Farmer</option>
-              <option>Teacher</option>
-              <option>Nurse</option>
-              <option>Accountant</option>
-              <option>Sales Executive</option>
-              <option>Graphic Designer</option>
-              <option>Software Engineer</option>
-              <option>Businessman</option>
-              <option>Doctor</option>
-              <option>Lawyer</option>
-              <option>Government Employee</option>
-              <option>Retired</option>
-            </select>
-          </div>
-
-          <div class="col-12"><label>Remarks</label><textarea name="remarks" placeholder="cooperative / busy / follow-up etc."></textarea></div>
-        </div>
-      </div>
-
       <div class="grid">
-        <div class="col-12" id="l1-status"></div>
-        <div class="col-12" style="display:flex;justify-content:flex-end;gap:10px">
-          <button class="btn" type="submit">Submit to Google Sheet</button>
+        <div class="col-3">
+          <label>Line 1 Player ID *</label>
+          <select name="line1" id="l1-id" required>
+            <option value="">Select</option>
+          </select>
+        </div>
+        <div class="col-3">
+          <label>PLAYER NAME *</label>
+          <input name="playerName" placeholder="e.g. John Doe" required/>
+        </div>
+        <div class="col-6">
+          <label>Customer</label>
+          <input name="customer" placeholder="e.g. Sayyad Mohammad Tameem"/>
+        </div>
+
+        <div class="col-3">
+          <label>Number</label>
+          <input name="number" inputmode="numeric" placeholder="e.g. 9959152719"/>
+        </div>
+        <div class="col-3">
+          <label>Language</label>
+          <select name="language">
+            <option></option><option>Hindi</option><option>English</option><option>Gujarati</option><option>Urdu</option><option>Other</option>
+          </select>
+        </div>
+        <div class="col-2">
+          <label>Age</label>
+          <input name="age" type="number" min="0" placeholder="N/A"/>
+        </div>
+        <div class="col-4">
+          <label>Gender</label>
+          <select name="gender"><option></option><option>male</option><option>female</option><option>other</option></select>
+        </div>
+
+        <div class="col-6">
+          <label>Location</label>
+          <input name="location" placeholder="e.g. Andhra Pradesh"/>
+        </div>
+        <div class="col-6">
+          <label>Profession</label>
+          <select name="profession">
+            <option></option>
+            <option>Businessman</option><option>Engineer</option><option>Shopkeeper</option><option>Doctor</option><option>Teacher</option>
+            <option>Driver</option><option>Farmer</option><option>Electrician</option><option>Plumber</option><option>Carpenter</option>
+            <option>Police</option><option>Army</option><option>Nurse</option><option>IT Professional</option><option>Sales</option>
+            <option>Student</option><option>Homemaker</option><option>Self Employed</option><option>Unemployed</option><option>Other</option>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label>Remarks</label>
+          <textarea name="remarks" placeholder="e.g. cooperative"></textarea>
         </div>
       </div>
+
+      <div class="row" style="justify-content:flex-end;margin-top:10px">
+        <span class="pill muted">Submits to Sheet tab: <b>line 1 data</b></span>
+        <button class="btn primary" type="submit">Submit</button>
+      </div>
+      <div id="l1-status" class="status muted"></div>
     </form>
   </section>
 
-  <!-- ===================== LINE 2 (PDF Only) ===================== -->
-  <section id="line2" class="tab-panel hidden">
-    <div class="toolbar">
-      <button class="btn ghost" id="l2-saveDraft">Save Draft</button>
-      <button class="btn ghost" id="l2-loadDraft">Load Draft</button>
-      <button class="btn" id="l2-downloadPdf">Download PDF</button>
-    </div>
+  <!-- ============ LINE 2 (PDF only) ============ -->
+  <section id="pane-l2" class="card hide">
+    <h2>Line 2 — Client Information (PDF Output)</h2>
 
     <form id="line2Form">
-      <!-- Client Information -->
-      <div class="card">
-        <h3 style="margin:4px 0 12px 0">Client Information</h3>
-        <div class="grid">
-          <div class="col-6"><label>Client Name *</label><input name="clientName" required/></div>
-          <div class="col-3"><label>Date</label><input type="date" name="date"/></div>
-          <div class="col-3"><label>Time</label><input type="time" name="time"/></div>
+      <!-- Client info -->
+      <div class="grid">
+        <div class="col-6"><label>Client Name *</label><input name="clientName" required/></div>
+        <div class="col-3"><label>Date</label><input type="date" name="date"/></div>
+        <div class="col-3"><label>Time</label><input type="time" name="time"/></div>
 
-          <div class="col-3"><label>Language</label>
-            <select name="language"><option value="">Select</option><option>English</option><option>Hindi</option><option>Gujarati</option><option>Other</option></select>
-          </div>
-          <div class="col-4"><label>Line 1</label>
-            <select id="l2-line1" name="line1"><option value="">Select</option></select>
-          </div>
-          <div class="col-4"><label>Line 2</label>
-            <select id="l2-line2" name="line2"><option value="">Select</option></select>
-          </div>
-          <div class="col-4"><label>Line 3</label>
-            <select name="line3"><option value="">Select</option><option>C1</option><option>C2</option></select>
-          </div>
-
-          <div class="col-3"><label>Charging (%)</label><input type="number" min="0" max="100" name="charging"/></div>
-          <div class="col-3"><label>Plugin</label><input name="plugin"/></div>
-          <div class="col-6"><label>Current Location</label>
-            <select name="currentLocation"><option value="">Select</option><option>Home</option><option>Office</option><option>Work</option><option>Friend</option><option>Other</option></select>
-          </div>
-
-          <div class="col-3"><label>Third Party (Y/N)</label><select name="thirdParty"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Client DOB</label><input type="date" name="dob"/></div>
-          <div class="col-3"><label>Client Age</label><input type="number" min="0" name="age"/></div>
-          <div class="col-3"><label>Aadhaar Number</label><input name="aadhaar"/></div>
-
-          <div class="col-3"><label>Gender</label><select name="gender"><option value=""></option><option>Male</option><option>Female</option><option>Other</option></select></div>
-          <div class="col-3"><label>Marriage (Y/N)</label><select name="marriage"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Kids (0–5)</label><select name="kids"><option value=""></option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
-          <div class="col-3"><label>Date of Marriage</label><input type="date" name="dom"/></div>
-
-          <div class="col-3"><label>Number (Y/N)</label><select name="numberActive"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>WhatsApp (Y/N)</label><select name="whatsapp"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Phone Number</label><input name="phone1"/></div>
-          <div class="col-3"><label>2nd Number</label><input name="phone2"/></div>
-
-          <div class="col-3"><label>Emergency No</label><input name="emergencyNo"/></div>
-          <div class="col-6"><label>E-mail</label><input type="email" name="email"/></div>
-          <div class="col-3"><label>Education</label>
-            <select name="education"><option value=""></option><option>Uneducated</option><option>Higher Edu</option><option>Bachelor</option><option>Master</option><option>Doctor/PHD</option></select>
-          </div>
-
-          <div class="col-3"><label>Work (Y/N)</label><select name="workYN"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Position</label><input name="position"/></div>
-          <div class="col-3"><label>Employment</label><select name="employment"><option value=""></option><option>Employed</option><option>Self-Employed</option><option>Student</option><option>Retired</option></select></div>
-          <div class="col-3"><label>Working Since</label><input type="number" min="1900" max="2100" name="workSince"/></div>
-
-          <div class="col-6"><label>Company Name</label><input name="companyName"/></div>
-          <div class="col-12"><label>Current Address</label><input name="currentAddress"/></div>
-
-          <div class="col-3"><label>Phone Model</label><input name="phoneModel"/></div>
-          <div class="col-3"><label>Other Phone (Y/N)</label><select name="otherPhoneYN"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Laptop (Y/N)</label><select name="laptopYN"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>2-wheeler (Y/N)</label><select name="twoWheelerYN"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>4-wheeler (Y/N)</label><select name="fourWheelerYN"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Total vehicles</label><input type="number" min="0" name="totalVehicle"/></div>
-          <div class="col-3"><label>Height (cm)</label><input type="number" min="0" name="height"/></div>
-          <div class="col-3"><label>Weight (kg)</label><input type="number" min="0" name="weight"/></div>
-          <div class="col-6"><label>Color Tone</label><select name="colorTone"><option value=""></option><option>Fair</option><option>Wheatish</option><option>Dusky</option><option>Dark</option></select></div>
-
-          <div class="col-3"><label>Passport (Y/N)</label><select name="passportYN"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Voter ID (Y/N)</label><select name="voterIdYN"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Place of Birth</label><input name="pob"/></div>
-          <div class="col-3"><label>Nationality</label><input name="nationality"/></div>
-          <div class="col-3"><label>Visa Rejected (Y/N)</label><select name="visaRejected"><option value=""></option><option>Y</option><option>N</option></select></div>
-          <div class="col-3"><label>Overstay (Y/N)</label><select name="overstayYN"><option value=""></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Language</label>
+          <select name="language"><option></option><option>English</option><option>Hindi</option><option>Gujarati</option><option>Other</option></select>
         </div>
+        <div class="col-4"><label>Line 1</label>
+          <select id="line1A" name="line1"><option value="">Select</option></select>
+        </div>
+        <div class="col-4"><label>Line 2</label>
+          <select id="line2B" name="line2"><option value="">Select</option></select>
+        </div>
+        <div class="col-4"><label>Line 3</label>
+          <select name="line3"><option value="">Select</option><option>C1</option><option>C2</option></select>
+        </div>
+
+        <div class="col-3"><label>Charging (%)</label><input type="number" min="0" max="100" name="charging"/></div>
+        <div class="col-3"><label>Plugin</label><input name="plugin"/></div>
+        <div class="col-6"><label>Current Location</label>
+          <select name="currentLocation"><option></option><option>Home</option><option>Office</option><option>Work</option><option>Friend</option><option>Other</option></select>
+        </div>
+
+        <div class="col-3"><label>Third Party (Y/N)</label><select name="thirdParty"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Client DOB</label><input type="date" name="dob"/></div>
+        <div class="col-3"><label>Client Age</label><input type="number" min="0" name="age"/></div>
+        <div class="col-3"><label>Aadhaar Number</label><input name="aadhaar"/></div>
+
+        <div class="col-3"><label>Gender</label><select name="gender"><option></option><option>Male</option><option>Female</option><option>Other</option></select></div>
+        <div class="col-3"><label>Marriage (Y/N)</label><select name="marriage"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Kids (0–5)</label><select name="kids"><option></option><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option></select></div>
+        <div class="col-3"><label>Date of Marriage</label><input type="date" name="dom"/></div>
+
+        <div class="col-3"><label>Number (Y/N)</label><select name="numberActive"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>WhatsApp (Y/N)</label><select name="whatsapp"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Phone Number</label><input name="phone1"/></div>
+        <div class="col-3"><label>2nd Number</label><input name="phone2"/></div>
+
+        <div class="col-3"><label>Emergency No</label><input name="emergencyNo"/></div>
+        <div class="col-6"><label>E-mail</label><input type="email" name="email"/></div>
+        <div class="col-3"><label>Education</label>
+          <select name="education"><option></option><option>Uneducated</option><option>Higher Edu</option><option>Bachelor</option><option>Master</option><option>Doctor/PHD</option></select>
+        </div>
+
+        <div class="col-3"><label>Work (Y/N)</label><select name="workYN"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Position</label><input name="position"/></div>
+        <div class="col-3"><label>Employment</label><select name="employment"><option></option><option>Employed</option><option>Self-Employed</option><option>Student</option><option>Retired</option></select></div>
+        <div class="col-3"><label>Working Since</label><input type="number" min="1900" max="2100" name="workSince"/></div>
+
+        <div class="col-6"><label>Company Name</label><input name="companyName"/></div>
+        <div class="col-12"><label>Current Address</label><input name="currentAddress"/></div>
+
+        <div class="col-3"><label>Phone Model</label><input name="phoneModel"/></div>
+        <div class="col-3"><label>Other Phone (Y/N)</label><select name="otherPhoneYN"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Laptop (Y/N)</label><select name="laptopYN"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>2-wheeler (Y/N)</label><select name="twoWheelerYN"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>4-wheeler (Y/N)</label><select name="fourWheelerYN"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Total vehicles</label><input type="number" min="0" name="totalVehicle"/></div>
+        <div class="col-3"><label>Height (cm)</label><input type="number" min="0" name="height"/></div>
+        <div class="col-3"><label>Weight (kg)</label><input type="number" min="0" name="weight"/></div>
+        <div class="col-6"><label>Color Tone</label><select name="colorTone"><option></option><option>Fair</option><option>Wheatish</option><option>Dusky</option><option>Dark</option></select></div>
+
+        <div class="col-3"><label>Passport (Y/N)</label><select name="passportYN"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Voter ID (Y/N)</label><select name="voterIdYN"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Place of Birth</label><input name="pob"/></div>
+        <div class="col-3"><label>Nationality</label><input name="nationality"/></div>
+        <div class="col-3"><label>Visa Rejected (Y/N)</label><select name="visaRejected"><option></option><option>Y</option><option>N</option></select></div>
+        <div class="col-3"><label>Overstay (Y/N)</label><select name="overstayYN"><option></option><option>Y</option><option>N</option></select></div>
       </div>
 
-      <!-- Family -->
-      <div class="card">
-        <h3 style="margin:4px 0 12px 0">Family Members</h3>
-        <table class="table" id="l2-family">
+      <!-- Tables -->
+      <div class="card" style="margin:16px 0 8px">
+        <h3 style="margin:0 0 8px">Family Members</h3>
+        <table id="l2-family">
           <thead><tr>
             <th>Member</th><th>Age</th><th>Job</th><th>Work/School Time</th>
             <th>Home Time</th><th>Work Off</th><th>Remarks</th><th>Expected Visitors</th><th></th>
-          </tr></thead><tbody></tbody>
+          </tr></thead>
+          <tbody></tbody>
         </table>
-        <div style="margin-top:8px"><button type="button" class="btn" onclick="addRow('l2-family')">+ Add Member</button></div>
+        <div class="row" style="margin-top:8px"><button type="button" class="btn" onclick="addFamilyRow()">+ Add Member</button></div>
       </div>
 
-      <!-- Daily Call Log -->
-      <div class="card">
-        <h3 style="margin:4px 0 12px 0">Daily Call Log</h3>
-        <table class="table" id="l2-calls">
+      <div class="card" style="margin:8px 0">
+        <h3 style="margin:0 0 8px">Daily Call Log</h3>
+        <table id="l2-calls">
           <thead><tr>
             <th>Relation</th><th>Time</th><th>Reason</th><th>Duration</th><th>Platform</th>
             <th>1st</th><th>2nd</th><th>3rd</th><th>4th</th><th>5th</th><th>6th</th><th></th>
-          </tr></thead><tbody></tbody>
+          </tr></thead>
+          <tbody></tbody>
         </table>
-        <div style="margin-top:8px"><button type="button" class="btn" onclick="addRow('l2-calls')">+ Add Call</button></div>
+        <div class="row" style="margin-top:8px"><button type="button" class="btn" onclick="addCallRow()">+ Add Call</button></div>
       </div>
 
-      <!-- Bank -->
-      <div class="card">
-        <h3 style="margin:4px 0 12px 0">Bank Details</h3>
-        <table class="table" id="l2-banks">
+      <div class="card" style="margin:8px 0">
+        <h3 style="margin:0 0 8px">Bank Details</h3>
+        <table id="l2-banks">
           <thead><tr>
             <th>Bank Name</th><th>Single/Joint</th><th>Saving/Current</th><th>Year</th>
             <th>Purpose</th><th>Cheque Book</th><th>Passbook</th><th>Internet Banking</th>
             <th>Phone Banking</th><th>UPI</th><th>PhonePe</th><th>Google Pay</th><th>Closing Balance</th><th>Fixed Deposit</th><th></th>
-          </tr></thead><tbody></tbody>
+          </tr></thead>
+          <tbody></tbody>
         </table>
-        <div style="margin-top:8px"><button type="button" class="btn" onclick="addRow('l2-banks')">+ Add Bank</button></div>
+        <div class="row" style="margin-top:8px"><button type="button" class="btn" onclick="addBankRow()">+ Add Bank</button></div>
       </div>
 
       <!-- Assets -->
-      <div class="card">
-        <h3 style="margin:4px 0 12px 0">Assets (Ask in detail)</h3>
+      <div class="card" style="margin:8px 0">
+        <h3 style="margin:0 0 8px">Assets (Ask in detail)</h3>
         <div class="grid">
           <div class="col-3">
-            <label><input id="asset_rd" type="checkbox"> RD</label>
-            <input class="asset-amt" id="asset_rd_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_mutualFunds" type="checkbox"> Mutual Funds</label>
-            <input class="asset-amt" id="asset_mutualFunds_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_shares" type="checkbox"> Shares</label>
-            <input class="asset-amt" id="asset_shares_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_gold" type="checkbox"> Gold</label>
-            <input class="asset-amt" id="asset_gold_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_diamond" type="checkbox"> Diamond</label>
-            <input class="asset-amt" id="asset_diamond_amt" type="number" min="0" step="0.01" placeholder="Amount">
+            <label><input id="asset_rd" type="checkbox"> RD</label> <input id="asset_rd_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_mutualFunds" type="checkbox"> Mutual Funds</label> <input id="asset_mutualFunds_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_shares" type="checkbox"> Shares</label> <input id="asset_shares_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_gold" type="checkbox"> Gold</label> <input id="asset_gold_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_diamond" type="checkbox"> Diamond</label> <input id="asset_diamond_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
           </div>
           <div class="col-3">
-            <label><input id="asset_silver" type="checkbox"> Silver</label>
-            <input class="asset-amt" id="asset_silver_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_vehicle" type="checkbox"> Vehicle</label>
-            <input class="asset-amt" id="asset_vehicle_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_realestate" type="checkbox"> Real estate</label>
-            <input class="asset-amt" id="asset_realestate_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_cash" type="checkbox"> Cash</label>
-            <input class="asset-amt" id="asset_cash_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_crypto" type="checkbox"> Crypto</label>
-            <input class="asset-amt" id="asset_crypto_amt" type="number" min="0" step="0.01" placeholder="Amount">
+            <label><input id="asset_silver" type="checkbox"> Silver</label> <input id="asset_silver_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_vehicle" type="checkbox"> Vehicle</label> <input id="asset_vehicle_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_realestate" type="checkbox"> Real estate</label> <input id="asset_realestate_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_cash" type="checkbox"> Cash</label> <input id="asset_cash_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_crypto" type="checkbox"> Crypto</label> <input id="asset_crypto_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
           </div>
           <div class="col-3">
-            <label><input id="asset_ppf" type="checkbox"> PPF</label>
-            <input class="asset-amt" id="asset_ppf_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_pf" type="checkbox"> PF</label>
-            <input class="asset-amt" id="asset_pf_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_coins" type="checkbox"> Coins</label>
-            <input class="asset-amt" id="asset_coins_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_limitedBooks" type="checkbox"> Limited Books</label>
-            <input class="asset-amt" id="asset_limitedBooks_amt" type="number" min="0" step="0.01" placeholder="Amount">
-            <label><input id="asset_expWatches" type="checkbox"> Exp. Watches</label>
-            <input class="asset-amt" id="asset_expWatches_amt" type="number" min="0" step="0.01" placeholder="Amount">
+            <label><input id="asset_ppf" type="checkbox"> PPF</label> <input id="asset_ppf_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_pf" type="checkbox"> PF</label> <input id="asset_pf_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_coins" type="checkbox"> Coins</label> <input id="asset_coins_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_limitedBooks" type="checkbox"> Limited Books</label> <input id="asset_limitedBooks_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
+            <label><input id="asset_expWatches" type="checkbox"> Exp. Watches</label> <input id="asset_expWatches_amt" type="number" min="0" step="0.01" placeholder="Amount" class="asset-amt">
           </div>
           <div class="col-3">
             <label>Asset Notes</label>
-            <textarea id="assetNotes" placeholder="Details about assets..."></textarea>
+            <textarea id="asset_notes" placeholder="Details about assets..."></textarea>
           </div>
         </div>
       </div>
+
+      <div class="row" style="justify-content:flex-end;gap:10px">
+        <span class="pill muted">Click <b>Download PDF</b> (top-right) to export.</span>
+      </div>
     </form>
-
-    <div class="note">This Line 2 section does not send to Google Sheets. Use “Download PDF”.</div>
   </section>
-</div>
 
-<!-- libs for Line 2 PDF -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <footer>© Alpha — one page: Line 1 (Sheet) + Line 2 (PDF)</footer>
+</main>
+
+<!-- ============  SCRIPTS  ============ -->
+<!-- jsPDF + AutoTable (for tiny, text-based PDFs) -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-/* ========= CONFIG =========
-   Paste your existing Line 1 Apps Script Web App URL below */
-const LINE1_SCRIPT_URL = "REPLACE_WITH_YOUR_LINE1_APPS_SCRIPT_URL"; // e.g. https://script.google.com/macros/s/AKfyc.../exec
+/* ================= SET YOUR LINE 1 APPS SCRIPT URL =================
+   Replace the value below with your working Web App URL for Line 1
+   (Looks like: https://script.google.com/macros/s/AKfycb.../exec )
+==================================================================== */
+const SCRIPT_URL_LINE1 = "PUT_YOUR_LINE1_APPS_SCRIPT_URL_HERE";
 
-/* ========= glitter background ========= */
-(function glitter(){
-  const c=document.getElementById('glitter'); const ctx=c.getContext('2d'); let w,h,stars=[];
-  function resize(){ w=c.width=innerWidth; h=c.height=innerHeight; stars=Array.from({length:120},()=>spawn()); }
-  function spawn(){ return {x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.8+.4,a:Math.random()*Math.PI*2,s:Math.random()*.6+.2,tw:Math.random()*.06+.02}; }
-  function tick(){ ctx.clearRect(0,0,w,h); stars.forEach(s=>{ s.x+=Math.cos(s.a)*s.s; s.y+=Math.sin(s.a)*s.s;
-    if(s.x<0||s.x>w||s.y<0||s.y>h) Object.assign(s,spawn(),{x:(s.x<0?w:(s.x>w?0:s.x)),y:(s.y<0?h:(s.y>h?0:s.y))});
-    const g=.6+Math.sin(performance.now()*s.tw)*.4; ctx.beginPath(); ctx.fillStyle=`rgba(167,139,250,${.65*g})`; ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();});
-    requestAnimationFrame(tick); }
-  addEventListener('resize', resize); resize(); tick();
-})();
+/* ========== Tabs ========== */
+const tabL1 = document.getElementById('tab-l1');
+const tabL2 = document.getElementById('tab-l2');
+const paneL1 = document.getElementById('pane-l1');
+const paneL2 = document.getElementById('pane-l2');
 
-/* ========= tabs ========= */
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
-    btn.classList.add('active');
-    document.getElementById(btn.dataset.tab).classList.remove('hidden');
-  });
-});
+function show(which){
+  if(which==='l1'){ tabL1.classList.add('active'); tabL2.classList.remove('active'); paneL1.classList.remove('hide'); paneL2.classList.add('hide'); }
+  else { tabL2.classList.add('active'); tabL1.classList.remove('active'); paneL2.classList.remove('hide'); paneL1.classList.add('hide'); }
+}
+tabL1.onclick=()=>show('l1'); tabL2.onclick=()=>show('l2');
 
-/* ========= Line 1: populate Player IDs A01..A20 ========= */
-(function(){
-  const sel = document.getElementById('l1-playerId');
-  for(let i=1;i<=20;i++) sel.add(new Option('A'+String(i).padStart(2,'0')));
-})();
+/* ========== Populate A01–A20 (Line1) and also for Line2's A/B lists ========== */
+function fillIDs(){
+  const l1 = document.getElementById('l1-id');
+  const a = document.getElementById('line1A');
+  const b = document.getElementById('line2B');
+  for(let i=1;i<=20;i++){
+    const opt1=document.createElement('option'); opt1.value=opt1.textContent='A'+String(i).padStart(2,'0'); l1.appendChild(opt1.cloneNode(true));
+    const optA=document.createElement('option'); optA.textContent='A'+String(i).padStart(2,'0'); a.appendChild(optA);
+    const optB=document.createElement('option'); optB.textContent='B'+String(i).padStart(2,'0'); b.appendChild(optB);
+  }
+}
 
-/* ========= Line 1: Save / Load Draft ========= */
-(function(){
-  const form = document.getElementById('line1Form');
-  document.getElementById('l1-saveDraft').addEventListener('click', ()=>{
-    const data = Object.fromEntries(new FormData(form).entries());
-    localStorage.setItem('alpha_line1_draft', JSON.stringify(data));
-    alert('Line 1 draft saved on this device.');
-  });
-  document.getElementById('l1-loadDraft').addEventListener('click', ()=>{
-    const raw = localStorage.getItem('alpha_line1_draft');
-    if(!raw) return alert('No draft found.');
-    const data = JSON.parse(raw);
-    for (const [k,v] of Object.entries(data)) { const el = form.elements[k]; if (!el) continue; el.value = v; }
-  });
-})();
-
-/* ========= Line 1: Submit to Google Sheets ========= */
+/* ========== Line 1 Submit to Sheets ========== */
 document.getElementById('line1Form').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const status = document.getElementById('l1-status');
-
-  if (!LINE1_SCRIPT_URL || LINE1_SCRIPT_URL.includes('REPLACE_WITH')) {
-    alert('Please set LINE1_SCRIPT_URL at the top of the file.');
-    return;
-  }
-
-  const fd = new FormData(e.target);
-  // helpful meta (your Apps Script can route by this)
-  fd.append('whichForm', 'line1');        // lets your script know this is Line 1
-  fd.append('sheet', 'line 1 data');      // optional: target sheet/tab name
-
-  const body = new URLSearchParams(fd);
+  status.textContent = 'Submitting...';
   try{
-    await fetch(LINE1_SCRIPT_URL, { method:'POST', mode:'no-cors', body });
-    status.innerHTML = '<div class="pill" style="border-color:#10b981;color:#065f46;background:#ecfdf5">Submitted to Google Sheet!</div>';
+    const body = new URLSearchParams(new FormData(e.target));
+    await fetch(SCRIPT_URL_LINE1, { method:'POST', mode:'no-cors', body });
+    status.innerHTML = '<span class="ok">Submitted to Google Sheet ✅</span>';
     e.target.reset();
   }catch(err){
     console.error(err);
-    status.innerHTML = '<div class="pill" style="border-color:#ef4444;color:#991b1b;background:#fef2f2">Network error. Check connection.</div>';
+    status.innerHTML = '<span class="err">Network error — check Apps Script URL.</span>';
   }
 });
 
-/* ========= Line 2: Select options (A01..A20 / B01..B20) ========= */
-(function(){
-  const l1 = document.getElementById('l2-line1');
-  const l2 = document.getElementById('l2-line2');
-  for (let i=1;i<=20;i++){
-    l1.add(new Option('A'+String(i).padStart(2,'0')));
-    l2.add(new Option('B'+String(i).padStart(2,'0')));
-  }
-})();
-
-/* ========= Line 2: dynamic tables ========= */
-function addRow(tableId){
-  const tb = document.querySelector(`#${tableId} tbody`);
+/* ========== Dynamic row helpers for Line 2 ========== */
+function addFamilyRow(obj={}){
+  const tb = document.querySelector('#l2-family tbody');
   const tr = document.createElement('tr');
-  if (tableId==='l2-family'){
-    tr.innerHTML = `
-      <td><input></td><td><input type="number" min="0"></td><td><input></td>
-      <td><input></td><td><input></td><td><input></td><td><input></td><td><input></td>
-      <td><button type="button" class="btn" onclick="this.closest('tr').remove()">Remove</button></td>`;
-  } else if (tableId==='l2-calls'){
-    tr.innerHTML = `
-      <td><input></td><td><input type="time"></td><td><input></td><td><input></td><td><input></td>
-      <td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td>
-      <td><button type="button" class="btn" onclick="this.closest('tr').remove()">Remove</button></td>`;
-  } else if (tableId==='l2-banks'){
-    tr.innerHTML = `
-      <td><input></td><td><input></td><td><input></td><td><input type="number" min="1900" max="2100"></td>
-      <td><input></td><td><input></td><td><input></td><td><input></td><td><input></td><td><input></td>
-      <td><input></td><td><input></td><td><input></td><td><input></td>
-      <td><button type="button" class="btn" onclick="this.closest('tr').remove()">Remove</button></td>`;
-  }
+  tr.innerHTML = `
+    <td><input value="${obj.member||''}"></td>
+    <td><input type="number" min="0" value="${obj.age||''}"></td>
+    <td><input value="${obj.job||''}"></td>
+    <td><input value="${obj.workTime||''}"></td>
+    <td><input value="${obj.homeTime||''}"></td>
+    <td><input value="${obj.workOff||''}"></td>
+    <td><input value="${obj.remarks||''}"></td>
+    <td><input value="${obj.expectedVisitors||''}"></td>
+    <td><button type="button" class="btn" onclick="this.closest('tr').remove()">Remove</button></td>`;
   tb.appendChild(tr);
 }
-// seed one empty row each
-['l2-family','l2-calls','l2-banks'].forEach(id=>addRow(id));
+function addCallRow(obj={}){
+  const tb = document.querySelector('#l2-calls tbody');
+  const tr=document.createElement('tr');
+  tr.innerHTML = `
+    <td><input value="${obj.relation||''}"></td>
+    <td><input type="time" value="${obj.time||''}"></td>
+    <td><input value="${obj.reason||''}"></td>
+    <td><input value="${obj.duration||''}"></td>
+    <td><input value="${obj.platform||''}"></td>
+    <td><input value="${obj.c1||''}"></td>
+    <td><input value="${obj.c2||''}"></td>
+    <td><input value="${obj.c3||''}"></td>
+    <td><input value="${obj.c4||''}"></td>
+    <td><input value="${obj.c5||''}"></td>
+    <td><input value="${obj.c6||''}"></td>
+    <td><button type="button" class="btn" onclick="this.closest('tr').remove()">Remove</button></td>`;
+  tb.appendChild(tr);
+}
+function addBankRow(obj={}){
+  const tb = document.querySelector('#l2-banks tbody');
+  const tr=document.createElement('tr');
+  tr.innerHTML = `
+    <td><input value="${obj.name||''}"></td>
+    <td><input value="${obj.singleJoint||''}"></td>
+    <td><input value="${obj.type||''}"></td>
+    <td><input type="number" min="1900" max="2100" value="${obj.year||''}"></td>
+    <td><input value="${obj.purpose||''}"></td>
+    <td><input value="${obj.chequeBook||''}"></td>
+    <td><input value="${obj.passbook||''}"></td>
+    <td><input value="${obj.internetBanking||''}"></td>
+    <td><input value="${obj.phoneBanking||''}"></td>
+    <td><input value="${obj.upi||''}"></td>
+    <td><input value="${obj.phonepe||''}"></td>
+    <td><input value="${obj.googlepay||''}"></td>
+    <td><input value="${obj.closingBalance||''}"></td>
+    <td><input value="${obj.fd||''}"></td>
+    <td><button type="button" class="btn" onclick="this.closest('tr').remove()">Remove</button></td>`;
+  tb.appendChild(tr);
+}
 
-/* ========= Line 2: Save/Load draft ========= */
-(function(){
+/* Enable/disable asset amount fields by checkbox state */
+function bindAssetAmounts(){
+  document.querySelectorAll('.asset-amt').forEach(amt=>{
+    const chk = document.getElementById(amt.id.replace('_amt',''));
+    const sync = ()=>{ amt.disabled = !(chk && chk.checked); };
+    if(chk){ chk.addEventListener('change', sync); sync(); }
+  });
+}
+
+/* Convert a table body to array of arrays (for AutoTable) */
+function tableRows(id){
+  const body=[];
+  document.querySelectorAll(`#${id} tbody tr`).forEach(tr=>{
+    const cells=[...tr.querySelectorAll('input,select,textarea')].map(i=>(i.value||'').toString());
+    if(cells.some(v=>v)) body.push(cells);
+  });
+  return body;
+}
+
+/* ========== Line 2 → Clean PDF (jsPDF + AutoTable) ========== */
+document.getElementById('l2-downloadPdf').addEventListener('click', ()=>{
+  show('l2'); // ensure Line 2 visible
   const form = document.getElementById('line2Form');
-  document.getElementById('l2-saveDraft').addEventListener('click', ()=>{
-    const base = Object.fromEntries(new FormData(form).entries());
-    function tableToArray(id, keys){
-      const rows=[]; document.querySelectorAll(`#${id} tbody tr`).forEach(tr=>{
-        const inp = tr.querySelectorAll('input,select,textarea'); const o={};
-        keys.forEach((k,i)=>o[k]=inp[i]?inp[i].value:''); rows.push(o);
-      }); return rows;
-    }
-    const draft = {
-      base,
-      fam: tableToArray('l2-family',['member','age','job','workTime','homeTime','workOff','remarks','expectedVisitors']),
-      calls: tableToArray('l2-calls',['relation','time','reason','duration','platform','c1','c2','c3','c4','c5','c6']),
-      banks: tableToArray('l2-banks',['name','singleJoint','type','year','purpose','cheque','passbook','internet','phone','upi','phonepe','gpay','closing','fd']),
-      assets: (()=>{ const ks=['rd','mutualFunds','shares','gold','diamond','silver','vehicle','realestate','cash','crypto','ppf','pf','coins','limitedBooks','expWatches'];
-        const obj={}; ks.forEach(k=>{ const chk=document.getElementById('asset_'+k); const amt=document.getElementById('asset_'+k+'_amt');
-          if(chk||amt) obj[k]={has:!!(chk&&chk.checked), amount: (amt&&amt.value)||''};}); return obj;})()
-    };
-    localStorage.setItem('alpha_line2_pdf_draft', JSON.stringify(draft));
-    alert('Line 2 draft saved on this device.');
-  });
-  document.getElementById('l2-loadDraft').addEventListener('click', ()=>{
-    const raw = localStorage.getItem('alpha_line2_pdf_draft');
-    if (!raw) return alert('No draft found.');
-    const {base={},fam=[],calls=[],banks=[],assets={}} = JSON.parse(raw);
-    const form=document.getElementById('line2Form');
-    for (const [k,v] of Object.entries(base)){ const el=form.elements[k]; if(!el) continue; el.value=v; }
-    // rebuild tables
-    const fb=document.querySelector('#l2-family tbody'); fb.innerHTML=''; fam.forEach(()=>addRow('l2-family'));
-    const cb=document.querySelector('#l2-calls tbody'); cb.innerHTML=''; calls.forEach(()=>addRow('l2-calls'));
-    const bb=document.querySelector('#l2-banks tbody'); bb.innerHTML=''; banks.forEach(()=>addRow('l2-banks'));
-    // restore cell values
-    function fillRows(id, rows){ const tb=document.querySelectorAll(`#${id} tbody tr`);
-      rows.forEach((row,i)=>{ const inputs = tb[i].querySelectorAll('input,select,textarea'); Object.values(row).forEach((v,idx)=>{ if(inputs[idx]) inputs[idx].value=v; }); });
-    }
-    fillRows('l2-family',fam); fillRows('l2-calls',calls); fillRows('l2-banks',banks);
-    // assets
-    Object.entries(assets).forEach(([k,v])=>{ const chk=document.getElementById('asset_'+k); const amt=document.getElementById('asset_'+k+'_amt'); if(chk) chk.checked=!!v.has; if(amt) amt.value=v.amount||''; });
-  });
-})();
-
-/* ========= Line 2: Download PDF ========= */
-document.getElementById('l2-downloadPdf').addEventListener('click', async ()=>{
-  const nameEl = document.querySelector('#line2Form input[name="clientName"]');
-  if (!nameEl || !nameEl.value.trim()) { alert('Please enter Client Name first.'); return; }
   const { jsPDF } = window.jspdf;
-  const target = document.querySelector('#line2'); // capture only the Line 2 section
 
-  // temporarily show the panel (in case user is on Line 1 tab)
-  const wasHidden = target.classList.contains('hidden');
-  if (wasHidden) target.classList.remove('hidden');
+  const v = n => (form.elements[n]?.value || '').trim();
+  const safe = s => (s || '').toString();
 
-  // white background for clean PDF
-  const originalBg = document.body.style.background;
-  document.body.style.background = '#ffffff';
+  const doc = new jsPDF({orientation:'p', unit:'mm', format:'a4', compressPdf:true});
 
-  const canvas = await html2canvas(target, { scale: 2, backgroundColor: '#ffffff' });
-  const imgData = canvas.toDataURL('image/png');
+  // Header
+  doc.setFont('helvetica','bold'); doc.setFontSize(14);
+  doc.text('Client Information (Line 2)', 14, 16);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9);
+  doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 22);
+  let y=28;
 
-  // restore
-  document.body.style.background = originalBg;
-  if (wasHidden) target.classList.add('hidden');
-
-  const pdf = new jsPDF('p','mm','a4');
-  const W  = pdf.internal.pageSize.getWidth();
-  const H  = pdf.internal.pageSize.getHeight();
-  const imgW = W;
-  const imgH = canvas.height * imgW / canvas.width;
-
-  let left = imgH, pos = 0;
-  pdf.addImage(imgData, 'PNG', 0, pos, imgW, imgH);
-  left -= H;
-  while (left > 0){
-    pos = left - imgH;
-    pdf.addPage();
-    pdf.addImage(imgData, 'PNG', 0, pos, imgW, imgH);
-    left -= H;
+  function block(header, rows){
+    const leftX=14,rightX=110,lineH=6;
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.text(header,leftX,y); y+=4;
+    doc.setDrawColor(200); doc.line(leftX,y,196,y); y+=3;
+    doc.setFont('helvetica','normal'); doc.setFontSize(10);
+    rows.forEach((r,i)=>{
+      const x=(i%2===0)?leftX:rightX; if(i%2===0 && i>0) y+=lineH;
+      doc.setFont('helvetica','bold'); doc.text(`${r[0]}:`,x,y);
+      doc.setFont('helvetica','normal'); doc.text(safe(r[1]),x+30,y);
+      if(y>270){ doc.addPage(); y=16; }
+    });
+    y+=6;
   }
-  const ts = new Date();
-  const fname = `Line2_${nameEl.value.trim().replace(/\s+/g,'_')}_${ts.getFullYear()}-${String(ts.getMonth()+1).padStart(2,'0')}-${String(ts.getDate()).padStart(2,'0')}.pdf`;
-  pdf.save(fname);
+
+  block('Client Information', [
+    ['Client Name', v('clientName')], ['Date', v('date')],
+    ['Time', v('time')], ['Language', v('language')],
+    ['Line 1', v('line1')], ['Line 2', v('line2')],
+    ['Line 3', v('line3')], ['Charging (%)', v('charging')],
+    ['Plugin', v('plugin')], ['Current Location', v('currentLocation')],
+    ['Third Party (Y/N)', v('thirdParty')], ['Client DOB', v('dob')],
+    ['Client Age', v('age')], ['Aadhaar Number', v('aadhaar')],
+    ['Gender', v('gender')], ['Marriage (Y/N)', v('marriage')],
+    ['Kids (0–5)', v('kids')], ['Date of Marriage', v('dom')],
+    ['Number (Y/N)', v('numberActive')], ['WhatsApp (Y/N)', v('whatsapp')],
+    ['Phone Number', v('phone1')], ['2nd Number', v('phone2')],
+    ['Emergency No', v('emergencyNo')], ['E-mail', v('email')],
+    ['Education', v('education')], ['Work (Y/N)', v('workYN')],
+    ['Position', v('position')], ['Employment', v('employment')],
+    ['Working Since', v('workSince')], ['Company Name', v('companyName')],
+    ['Current Address', v('currentAddress')], ['Phone Model', v('phoneModel')],
+    ['Other Phone (Y/N)', v('otherPhoneYN')], ['Laptop (Y/N)', v('laptopYN')],
+    ['2-wheeler (Y/N)', v('twoWheelerYN')], ['4-wheeler (Y/N)', v('fourWheelerYN')],
+    ['Total vehicles', v('totalVehicle')], ['Height (cm)', v('height')],
+    ['Weight (kg)', v('weight')], ['Color Tone', v('colorTone')],
+    ['Passport (Y/N)', v('passportYN')], ['Voter ID (Y/N)', v('voterIdYN')],
+    ['Place of Birth', v('pob')], ['Nationality', v('nationality')],
+    ['Visa Rejected (Y/N)', v('visaRejected')], ['Overstay (Y/N)', v('overstayYN')],
+  ]);
+
+  // Family
+  const fam = tableRows('l2-family');
+  if(fam.length){
+    doc.autoTable({
+      startY:y,
+      head:[['Member','Age','Job','Work/School Time','Home Time','Work Off','Remarks','Expected Visitors']],
+      body:fam, theme:'grid',
+      styles:{font:'helvetica',fontSize:9,cellPadding:2}, headStyles:{fillColor:[18,24,50]},
+      margin:{left:14,right:14}
+    }); y = doc.lastAutoTable.finalY + 6;
+  }
+
+  // Calls
+  const calls = tableRows('l2-calls');
+  if(calls.length){
+    doc.autoTable({
+      startY:y,
+      head:[['Relation','Time','Reason','Duration','Platform','1st','2nd','3rd','4th','5th','6th']],
+      body:calls, theme:'grid',
+      styles:{font:'helvetica',fontSize:9,cellPadding:2}, headStyles:{fillColor:[18,24,50]},
+      margin:{left:14,right:14}
+    }); y = doc.lastAutoTable.finalY + 6;
+  }
+
+  // Banks
+  const banks = tableRows('l2-banks');
+  if(banks.length){
+    doc.autoTable({
+      startY:y,
+      head:[['Bank Name','Single/Joint','Saving/Current','Year','Purpose','Cheque Book','Passbook','Internet Banking','Phone Banking','UPI','PhonePe','Google Pay','Closing Balance','Fixed Deposit']],
+      body:banks, theme:'grid',
+      styles:{font:'helvetica',fontSize:9,cellPadding:2}, headStyles:{fillColor:[18,24,50]},
+      margin:{left:14,right:14}
+    }); y = doc.lastAutoTable.finalY + 6;
+  }
+
+  // Assets
+  const aset=[];
+  const keys=['rd','mutualFunds','shares','gold','diamond','silver','vehicle','realestate','cash','crypto','ppf','pf','coins','limitedBooks','expWatches'];
+  keys.forEach(k=>{
+    const has=document.getElementById('asset_'+k)?.checked?'Y':'N';
+    const amt=document.getElementById('asset_'+k+'_amt')?.value||'';
+    const name=k.replace(/([A-Z])/g,' $1').replace(/^./,m=>m.toUpperCase());
+    aset.push([name, has, amt]);
+  });
+  doc.autoTable({
+    startY:y, head:[['Asset','Has','Amount']], body:aset, theme:'grid',
+    styles:{font:'helvetica',fontSize:9,cellPadding:2}, headStyles:{fillColor:[18,24,50]},
+    margin:{left:14,right:14}
+  });
+
+  // Footer page numbers
+  const count=doc.internal.getNumberOfPages();
+  for(let i=1;i<=count;i++){
+    doc.setPage(i); doc.setFontSize(8);
+    doc.text(`Page ${i} of ${count}`, 196-20, 292, {align:'right'});
+  }
+
+  const client = v('clientName') || 'Client';
+  const d=new Date();
+  const fname=`Line2_${client.replace(/\s+/g,'_')}_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.pdf`;
+  doc.save(fname);
+});
+
+/* ========== Init ========== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  fillIDs();
+  addFamilyRow(); addCallRow(); addBankRow();
+  bindAssetAmounts();
 });
 </script>
 </body>
